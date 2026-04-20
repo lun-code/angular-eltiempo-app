@@ -1,0 +1,128 @@
+<div class="stars"></div>
+
+<div class="content p-8">
+  @if (cargando()) {
+    <div class="flex items-center justify-center h-screen">
+      <p class="text-blue-300 text-xl tracking-widest animate-pulse">
+        CARGANDO DATOS...
+      </p>
+    </div>
+
+  } @else if (error()) {
+    <div class="flex items-center justify-center h-screen">
+      <p class="text-red-400 text-lg">{{ error() }}</p>
+    </div>
+
+  } @else if (tiempo(); as t) {
+    <!-- Cabecera -->
+    <div class="mb-10">
+      <p class="text-blue-400 text-sm tracking-[0.3em] uppercase mb-1">
+        Predicción meteorológica
+      </p>
+      <h1 class="text-7xl text-white mb-1">
+        {{ t.nombre }}
+      </h1>
+      <p class="text-slate-400 text-sm">
+        {{ t.provincia }} · Actualizado {{ t.elaborado | date:'d MMM, HH:mm' }}
+      </p>
+    </div>
+
+    <!-- Tabla -->
+    <div class="glass rounded-2xl overflow-hidden">
+
+      <!-- Fila de fechas -->
+      <div class="grid border-b border-white/10"
+           [style.grid-template-columns]="'170px repeat(' + t.prediccion.dia.length + ', 1fr)'">
+        <div class="p-4 flex items-center justify-center">
+            <span class="text-blue-500 font-bold text-xl tracking-widest">AEMET</span>
+        </div>
+        @for (dia of t.prediccion.dia; track dia.fecha) {
+          <div class="day-col p-4 text-center border-l border-white/10">
+            <p class="text-blue-400 text-xs tracking-widest uppercase">
+              {{ dia.fecha | date:'EEEE' }}
+            </p>
+            <p class="text-white font-medium text-lg">
+              {{ dia.fecha | date:'d MMM' }}
+            </p>
+          </div>
+        }
+      </div>
+
+      <!-- Cielo -->
+      <div class="grid border-b border-white/10"
+           [style.grid-template-columns]="'170px repeat(' + t.prediccion.dia.length + ', 1fr)'">
+        <div class="p-4 flex items-center gap-2 text-slate-500 text-lg">🌤️ Estado</div>
+        @for (dia of t.prediccion.dia; track dia.fecha) {
+          <div class="day-col p-4 text-center border-l border-white/10 text-sm text-slate-300">
+            {{ dia.estadoCielo[0].descripcion || '—' }}
+          </div>
+        }
+      </div>
+
+      <!-- Temperatura máxima -->
+      <div class="grid border-b border-white/10"
+           [style.grid-template-columns]="'170px repeat(' + t.prediccion.dia.length + ', 1fr)'">
+        <div class="p-4 flex items-center text-slate-500 text-lg">🌡️ Máxima</div>
+        @for (dia of t.prediccion.dia; track dia.fecha) {
+          <div class="day-col p-4 text-center border-l border-white/10">
+            <span class="text-orange-400 font-semibold text-lg">
+              {{ dia.temperatura.maxima }}°
+            </span>
+          </div>
+        }
+      </div>
+
+      <!-- Temperatura mínima -->
+      <div class="grid border-b border-white/10"
+           [style.grid-template-columns]="'170px repeat(' + t.prediccion.dia.length + ', 1fr)'">
+        <div class="p-4 flex items-center text-slate-500 text-lg">❄️ Mínima</div>
+        @for (dia of t.prediccion.dia; track dia.fecha) {
+          <div class="day-col p-4 text-center border-l border-white/10">
+            <span class="text-blue-400 font-semibold text-lg">
+              {{ dia.temperatura.minima }}°
+            </span>
+          </div>
+        }
+      </div>
+
+      <!-- Lluvia -->
+      <div class="grid border-b border-white/10"
+           [style.grid-template-columns]="'170px repeat(' + t.prediccion.dia.length + ', 1fr)'">
+        <div class="p-4 flex items-center text-slate-500 text-lg">🌧️ Lluvia</div>
+        @for (dia of t.prediccion.dia; track dia.fecha) {
+          <div class="day-col p-4 text-center border-l border-white/10 text-slate-300 text-sm">
+            {{ dia.probPrecipitacion[0].value }}%
+          </div>
+        }
+      </div>
+
+      <!-- Humedad -->
+      <div class="grid border-b border-white/10"
+           [style.grid-template-columns]="'170px repeat(' + t.prediccion.dia.length + ', 1fr)'">
+        <div class="p-4 flex items-center text-slate-500 text-lg">💧 Humedad</div>
+        @for (dia of t.prediccion.dia; track dia.fecha) {
+          <div class="day-col p-4 text-center border-l border-white/10 text-slate-300 text-sm">
+            {{ dia.humedadRelativa.maxima }}%
+          </div>
+        }
+      </div>
+
+      <!-- Viento -->
+      <div class="grid"
+           [style.grid-template-columns]="'170px repeat(' + t.prediccion.dia.length + ', 1fr)'">
+        <div class="p-4 flex items-center text-slate-500 text-lg">🍃 Viento</div>
+        @for (dia of t.prediccion.dia; track dia.fecha) {
+          <div class="day-col p-4 text-center border-l border-white/10 text-slate-300 text-sm">
+            {{ dia.viento[0].direccion }} {{ dia.viento[0].velocidad }} km/h
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <p class="text-center text-slate-600 text-xs mt-6">
+      © AEMET · Autorizado el uso de la información citando a AEMET como autora
+    </p>
+  }
+</div>
