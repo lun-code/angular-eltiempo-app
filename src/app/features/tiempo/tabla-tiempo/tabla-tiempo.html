@@ -1,27 +1,67 @@
 <div class="stars"></div>
 
 <div class="content p-8">
+
+  <!-- ── Buscador de municipio ── -->
+  <div class="mb-10">
+    <p class="text-blue-400 text-sm tracking-[0.3em] uppercase mb-4">
+      Predicción meteorológica
+    </p>
+
+    <div class="relative max-w-sm mb-6">
+      <div class="flex items-center gap-2 glass rounded-xl px-4 py-3">
+        <span class="text-slate-400 text-lg">🔍</span>
+        <input
+          type="text"
+          placeholder="Buscar municipio..."
+          [value]="busqueda()"
+          (input)="onBusquedaChange($any($event.target).value)"
+          (focus)="selectorAbierto.set(true)"
+          (blur)="cerrarSelector()"
+          class="bg-transparent text-white placeholder-slate-500 outline-none w-full text-sm tracking-wide"
+        />
+        @if (busqueda()) {
+          <button
+            (mousedown)="busqueda.set('')"
+            class="text-slate-500 hover:text-white transition-colors text-lg leading-none"
+          >✕</button>
+        }
+      </div>
+
+      <!-- Desplegable de sugerencias -->
+      @if (selectorAbierto() && sugerencias().length) {
+        <ul class="absolute z-20 mt-1 w-full bg-[#0d1829] rounded-xl overflow-hidden shadow-2xl border border-white/10">
+          @for (m of sugerencias(); track m.id) {
+            <li
+              (mousedown)="cargarMunicipio(m)"
+              class="px-4 py-3 text-sm text-slate-200 hover:bg-white/10 cursor-pointer transition-colors flex justify-between items-center"
+            >
+              <span>{{ m.nombre }}</span>
+              <span class="text-slate-500 text-xs">{{ m.codigoMunicipio }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+
+  <!-- ── Estados de carga / error ── -->
   @if (cargando()) {
-    <div class="flex items-center justify-center h-screen">
+    <div class="flex items-center justify-center h-64">
       <p class="text-blue-300 text-xl tracking-widest animate-pulse">
         CARGANDO DATOS...
       </p>
     </div>
 
   } @else if (error()) {
-    <div class="flex items-center justify-center h-screen">
+    <div class="flex items-center justify-center h-64">
       <p class="text-red-400 text-lg">{{ error() }}</p>
     </div>
 
   } @else if (tiempo(); as t) {
-    <!-- Cabecera -->
-    <div class="mb-10">
-      <p class="text-blue-400 text-sm tracking-[0.3em] uppercase mb-1">
-        Predicción meteorológica
-      </p>
-      <h1 class="text-7xl text-white mb-1">
-        {{ t.nombre }}
-      </h1>
+    <!-- Cabecera del municipio -->
+    <div class="mb-6">
+      <h1 class="text-7xl text-white mb-1">{{ t.nombre }}</h1>
       <p class="text-slate-400 text-sm">
         {{ t.provincia }} · Actualizado {{ t.elaborado | date:'d MMM, HH:mm' }}
       </p>
@@ -34,7 +74,7 @@
       <div class="grid border-b border-white/10"
            [style.grid-template-columns]="'170px repeat(' + t.prediccion.dia.length + ', 1fr)'">
         <div class="p-4 flex items-center justify-center">
-            <span class="text-blue-500 font-bold text-xl tracking-widest">AEMET</span>
+          <span class="text-blue-500 font-bold text-xl tracking-widest">AEMET</span>
         </div>
         @for (dia of t.prediccion.dia; track dia.fecha) {
           <div class="day-col p-4 text-center border-l border-white/10">
@@ -65,9 +105,7 @@
         <div class="p-4 flex items-center text-slate-500 text-lg">🌡️ Máxima</div>
         @for (dia of t.prediccion.dia; track dia.fecha) {
           <div class="day-col p-4 text-center border-l border-white/10">
-            <span class="text-orange-400 font-semibold text-lg">
-              {{ dia.temperatura.maxima }}°
-            </span>
+            <span class="text-orange-400 font-semibold text-lg">{{ dia.temperatura.maxima }}°</span>
           </div>
         }
       </div>
@@ -78,9 +116,7 @@
         <div class="p-4 flex items-center text-slate-500 text-lg">❄️ Mínima</div>
         @for (dia of t.prediccion.dia; track dia.fecha) {
           <div class="day-col p-4 text-center border-l border-white/10">
-            <span class="text-blue-400 font-semibold text-lg">
-              {{ dia.temperatura.minima }}°
-            </span>
+            <span class="text-blue-400 font-semibold text-lg">{{ dia.temperatura.minima }}°</span>
           </div>
         }
       </div>
